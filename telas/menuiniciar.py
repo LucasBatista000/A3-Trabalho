@@ -1,51 +1,64 @@
 import customtkinter as ctk
 from PIL import Image
 from telas.meuslivros import *
+from telas.menuperfil import *
 
 
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Menu Iniciar")
-        self.geometry("1980x900")
+        self.title("Biblioteca Pessoal")
+        self.geometry("1400x700")
 
-        self.frame_superior = ctk.CTkFrame(
-            self, fg_color="#C3BCBC", height=75, corner_radius=0)
+        # Frame superior onde fica o frame dos botões
+        self.frame_superior = ctk.CTkFrame(self, fg_color="#C3BCBC", height=75, corner_radius=0)
         self.frame_superior.pack(fill="x")
-        frame_botoes = ctk.CTkFrame(
-            self.frame_superior, fg_color="transparent", corner_radius=0)
+        
+        # Frame para alocar os botões no meio do topo
+        frame_botoes = ctk.CTkFrame(self.frame_superior, fg_color="transparent", corner_radius=0)
         frame_botoes.place(relx=0.5, rely=0.5, anchor="center")
+        
+        # Frame responsável pelo meio da tela ( Será trocado por outro frame ao apertar no botão )
+        self.meio = ctk.CTkFrame(self, fg_color="white", corner_radius=0, border_width=0)
+        self.meio.pack(side="top", fill="both", expand=True)
 
-        self.meio = ctk.CTkFrame(self, fg_color="white", corner_radius=0)
-        self.meio.pack(fill="both", expand=True)
-
+        self.meio.grid_rowconfigure(0, weight=1)
+        self.meio.grid_columnconfigure(0, weight=1)
+        
+        # Chama a função que inicia o menu de botões
         self.configurar_menu_botoes()
 
+        # Loop responsável por carregar os frames
         self.frames = {}
-        for F in (MenuIniciar, MeusLivros):
+        for F in (MenuIniciar, MeusLivros, Perfil):
             frame = F(self.meio, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
+        # Inicia a função que mostra as telas
         self.mostrar_tela(MenuIniciar)
 
     def configurar_menu_botoes(self):
-        frame_botoes = ctk.CTkFrame(
-            self.frame_superior, fg_color="transparent", corner_radius=0)
+        frame_botoes = ctk.CTkFrame(self.frame_superior, fg_color="transparent", corner_radius=0)
         frame_botoes.place(relx=0.5, rely=0.5, anchor="center")
+        
+        icone_meus = ctk.CTkImage(light_image=Image.open("imagens/icone_meus_livros.png"), size=(30, 30))
+        icone_relatorio = ctk.CTkImage(light_image=Image.open("imagens/icone_relatorio.png"), size=(30, 30))
+        icone_sair = ctk.CTkImage(light_image=Image.open("imagens/icone_sair.png"), size=(30, 30))
+        icone_perfil = ctk.CTkImage(light_image=Image.open("imagens/icone_perfil.png"), size=(30, 30))
+        
         # Botões do menu inicial para entrada das funcionalidades e menus do sistema
         btn_menus = [
-            ("📚\nListar livros", lambda: print("listar")),
-            ("📁\nMeus livros", lambda: self.mostrar_tela(MeusLivros)),
-            ("📒\nCadastro Livros", lambda: print("livros")),
-            ("🙍\nCadastro Leitor", lambda: print("leitor")),
-            ("📊\nRelatórios", lambda: print("relatorios")),
-            ("⚙️\nSair", lambda: self.destroy())
+            ("Meus livros", lambda: self.mostrar_tela(MeusLivros), icone_meus),
+            ("Relatórios", lambda: print("relatorios"), icone_relatorio),
+            ("Meu perfil", lambda: self.mostrar_tela(Perfil), icone_perfil),
+            ("Sair", lambda: self.destroy(), icone_sair)
         ]
 
-        for nome, comando in btn_menus:  # Laço for que cria os botões do menu inicial, utilizando a biblioteca customtkinter para estilização
+        for nome, comando, icone in btn_menus:
             btn = ctk.CTkButton(frame_botoes, text=nome, text_color="black", height=50, width=50,
-                                fg_color="#C3BCBC", hover_color="#B0A8A8", font=("Inter", 18), command=comando)
+                compound="top", image=icone, fg_color="#C3BCBC", hover_color="#B0A8A8", 
+                font=("Inter", 18),command=comando)
             btn.pack(side="left", padx=10, pady=10, anchor="center")
 
     def mostrar_tela(self, tela):
@@ -59,14 +72,7 @@ class MenuIniciar(ctk.CTkFrame):
         self.controller = controller
         self.configure(fg_color="transparent")
 
-        imagem_carregada = Image.open("imagens/fundo.png")
-        minha_imagem = ctk.CTkImage(
-            light_image=imagem_carregada, size=(1980, 850))
-
-        ctk.CTkLabel(self, image=minha_imagem, text=" ",
-                     font=ctk.CTkFont(size=20)).place(relx=0.5, rely=0.5, anchor="center")
-
-        titulo_central = ctk.CTkLabel(self, text="GERENCIAMENTO DA FAZENDA\n v1.0", font=(
-            "Segoe UI", 50, "bold"), text_color="black", fg_color="transparent")
+        titulo_central = ctk.CTkLabel(self, text="Biblioteca Pessoal", text_color="black", font=("Inter", 30, "bold"))
         titulo_central.place(relx=0.5, rely=0.5, anchor="center")
+
         print('RELATÓRIO: Tela inicial funcionando.')
